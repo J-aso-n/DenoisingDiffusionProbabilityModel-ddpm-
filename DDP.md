@@ -1,9 +1,5 @@
 # PyTorch多卡训练
 
-环境：
-
-torch 2.7.0 + cuda 12.6
-
 ### （1）DataParallel
 
 ```主卡（cuda:0）压力大，速度慢，显存利用率低。```
