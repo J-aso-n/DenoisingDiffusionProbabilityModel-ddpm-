@@ -12,7 +12,7 @@ net_model = torch.nn.DataParallel(net_model, device_ids=device_ids)
 
 eg.
 
-```
+```python
 device_ids = [0,1,2,3]
 device = torch.device(f"cuda:{device_ids[0]}")
 net_model = UNet(...).to(device)
@@ -27,7 +27,7 @@ DataParallel 的主模型（主副本）会放在第一个卡上（cuda:0），�
 
 import
 
-```
+```python
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data.distributed import DistributedSampler
@@ -35,7 +35,7 @@ from torch.utils.data.distributed import DistributedSampler
 
 初始化分布式环境
 
-```
+```python
 local_rank = int(os.environ["LOCAL_RANK"])
 torch.cuda.set_device(local_rank)
 dist.init_process_group(backend="nccl")
@@ -44,13 +44,13 @@ device = torch.device("cuda", local_rank)
 
 模型封装
 
-```
+```python
 net_model = DDP(net_model, device_ids=[local_rank])
 ```
 
 用Sampler封装数据
 
-```
+```python
 dataset = CIFAR10(...)
 sampler = DistributedSampler(dataset)
 dataloader = DataLoader(dataset, batch_size=modelConfig["batch_size"], shuffle=False, ... , sampler=sampler)
@@ -58,20 +58,20 @@ dataloader = DataLoader(dataset, batch_size=modelConfig["batch_size"], shuffle=F
 
 训练时用sampler分发数据，在每个epoch下加上
 
-```
+```python
 sampler.set_epoch(e)
 ```
 
 训练循环中只在主进程保存模型
 
-```
+```python
 if dist.get_rank() == 0:
-  torch.save(net_model.module.state_dict(), os.path.join(modelConfig["save_weight_dir"], str(e) + "_.pt"))
+    torch.save(net_model.module.state_dict(), os.path.join(modelConfig["save_weight_dir"], str(e) + "_.pt"))
 ```
 
 训练结束后销毁进程组
 
-```
+```python
 dist.destroy_process_group()
 ```
 
@@ -95,17 +95,17 @@ CUDA_VISIBLE_DEVICES=0,1,3,5 torchrun --nproc_per_node=4 Main.py
 
 import
 
-```
+```python
 import multiprocessing
 ```
 
 args是function调用所需的实参
 
-```
+```python
 for e in epoches:
-  args.append((e))
+    args.append((e))
 with multiprocessing.Pool(processes=min(8, len(epoches))) as pool:
-  results = pool.map(function, args)
+    results = pool.map(function, args)
 ```
 
 ### （2）concurrent.futures
@@ -114,21 +114,21 @@ with multiprocessing.Pool(processes=min(8, len(epoches))) as pool:
 
 * ProcessPoolExecutor：多进程，适合CPU密集型任务（如大规模计算、模型推理等）。
 
-```
+```python
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 results = []
 
 with ThreadPoolExecutor(max_workers=8) as executor:
-  futures = []
-  for e in epoches:
-    futures.append(executor.submit(function, e))
-  for future in as_completed(futures):
-    try:
-      result = future.result()
-      results.append(result)
-    except Exception as e:
-      print(f"子进程异常: {e}")
+    futures = []
+    for e in epoches:
+        futures.append(executor.submit(function, e))
+    for future in as_completed(futures):
+        try:
+            result = future.result()
+            results.append(result)
+        except Exception as e:
+            print(f"子进程异常: {e}")
 ```
 
 e是function调用所需的实参，ProcessPoolExecutor与ThreadPoolExecutor相似，替换即可
