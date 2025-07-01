@@ -66,7 +66,7 @@ sampler.set_epoch(e)
 
 ```
 if dist.get_rank() == 0:
-	torch.save(net_model.module.state_dict(), os.path.join(modelConfig["save_weight_dir"], str(e) + "_.pt"))
+  torch.save(net_model.module.state_dict(), os.path.join(modelConfig["save_weight_dir"], str(e) + "_.pt"))
 ```
 
 训练结束后销毁进程组
@@ -87,9 +87,11 @@ torchrun --nproc_per_node=8 Main.py
 CUDA_VISIBLE_DEVICES=0,1,3,5 torchrun --nproc_per_node=4 Main.py
 ```
 
-# **多线程**
 
-### **（1）multiprocessing**
+
+# 多进程/多线程
+
+### （1）multiprocessing多进程，适合CPU密集型任务
 
 import
 
@@ -101,7 +103,32 @@ args是function调用所需的实参
 
 ```
 for e in epoches:
-	args.append((e))
+  args.append((e))
 with multiprocessing.Pool(processes=min(8, len(epoches))) as pool:
-	results = pool.map(function, args)
+  results = pool.map(function, args)
 ```
+
+### （2）concurrent.futures
+
+* ThreadPoolExecutor：多线程，适合I/O密集型任务（如文件读写、网络请求、图片加载等）
+
+* ProcessPoolExecutor：多进程，适合CPU密集型任务（如大规模计算、模型推理等）。
+
+```
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+results = []
+
+with ThreadPoolExecutor(max_workers=8) as executor:
+  futures = []
+  for e in epoches:
+    futures.append(executor.submit(function, e))
+  for future in as_completed(futures):
+    try:
+      result = future.result()
+      results.append(result)
+    except Exception as e:
+      print(f"子进程异常: {e}")
+```
+
+e是function调用所需的实参，ProcessPoolExecutor与ThreadPoolExecutor相似，替换即可
