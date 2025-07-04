@@ -3,6 +3,8 @@
 
 This is a clone from [DenoisingDiffusionProbabilityModel-ddpm-](https://github.com/zoubohao/DenoisingDiffusionProbabilityModel-ddpm-.git). It is an excellent implement of DDPM trained with CIFAR-10 dataset which let me get a better grasp of DDPM.
 
+This is just the project I do my own learning and update some notes. If you are interested, welcome clone, else you can clone from [the source project](https://github.com/zoubohao/DenoisingDiffusionProbabilityModel-ddpm-.git).
+
 On the basis, I just do some small changes like turning single-gpu training to multi-gpu training using DDP.
 
 ### Files added
