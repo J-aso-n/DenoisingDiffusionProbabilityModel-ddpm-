@@ -30,6 +30,16 @@ single-gpu train / eval:
 python Main.py
 ```
 
-### Other
+### Reference
 
-Still updating
+diffusion paper: https://proceedings.mlr.press/v37/sohl-dickstein15.html
+
+DDPM paper: https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html
+
+DDPM code: https://github.com/zoubohao/DenoisingDiffusionProbabilityModel-ddpm-.git
+
+An In-Depth Guide to DDPM: https://learnopencv.com/denoising-diffusion-probabilistic-models/
+
+DDPM理论梳理: https://zhuanlan.zhihu.com/p/560603623
+
+扩散模型Diffusion Model原理: https://www.cnblogs.com/weilonghu/articles/16994430.html
